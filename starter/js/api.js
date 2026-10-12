@@ -26,12 +26,15 @@ export async function request(method, path, data, options = {}) {
   headers.set("Accept", "application/json");
 
   const init = { ...options, method, headers };
+  delete init.onResponse;
   if (data !== undefined) {
     headers.set("Content-Type", "application/json");
     init.body = JSON.stringify(data);
   }
 
   const response = await fetch(`${API}${path}`, init);
+  options.onResponse?.(response);
+
   if (!response.ok) {
     let body = null;
     try {

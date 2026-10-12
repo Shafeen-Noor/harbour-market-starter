@@ -12,10 +12,7 @@ export const state = {
 
 // Derived, never stored: what should be on screen right now?
 export function visibleStalls() {
-  const query = state.query.trim().toLowerCase();
-  return state.stalls
-    .filter((stall) => state.tag === "all" || stall.tag === state.tag)
-    .filter((stall) => stall.name.toLowerCase().includes(query));
+  return state.stalls;
 }
 
 export function toggleSaved(id) {

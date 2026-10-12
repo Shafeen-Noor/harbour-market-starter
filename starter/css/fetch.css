@@ -8,6 +8,7 @@
    ========================================================================== */
 
 .vendor-card .rating { font: 700 0.8rem/1 ui-monospace, Menlo, monospace; color: var(--lantern); margin: -0.6rem 0 1rem; }
+.vendor-list[aria-busy="true"] .stall { opacity: 0.55; }
 
 /* while the request is in flight */
 .vendor-list[aria-busy="true"] .empty { animation: pulse 1.2s ease-in-out infinite alternate; }
