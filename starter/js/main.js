@@ -1,4 +1,4 @@
-// The only file the HTML loads. It wires events to state and starts the page.
+import { describe, getJSON } from "./api.js";
 import { state, toggleSaved } from "./state.js";
 import { save, load } from "./storage.js";
 import { render } from "./render.js";
@@ -7,11 +7,30 @@ import { setupTickets } from "./tickets.js";
 
 const filters = document.querySelector(".filters");
 const list = document.querySelector(".vendor-list");
+const search = document.querySelector("#vendor-search");
+const errorBox = document.querySelector(".load-error");
 
-// Every change goes through here: draw, then remember
 function update() {
   render();
   save();
+}
+
+async function loadStalls() {
+  state.status = "loading";
+  state.error = "";
+  render();
+
+  try {
+    state.stalls = await getJSON("/stalls");
+    state.total = state.stalls.length;
+    state.status = "ready";
+  } catch (error) {
+    state.error = `Couldn't load the vendors: ${describe(error)}.`;
+    state.status = "error";
+    console.error(error);
+  }
+
+  render();
 }
 
 filters.addEventListener("click", (event) => {
@@ -21,12 +40,11 @@ filters.addEventListener("click", (event) => {
   update();
 });
 
-document.querySelector("#vendor-search").addEventListener("input", (event) => {
+search.addEventListener("input", (event) => {
   state.query = event.target.value;
   update();
 });
 
-// The cards are redrawn all the time: one listener on the list hears every ♡
 list.addEventListener("click", (event) => {
   const button = event.target.closest(".save");
   if (!button) return;
@@ -34,7 +52,13 @@ list.addEventListener("click", (event) => {
   update();
 });
 
+errorBox.querySelector("button").addEventListener("click", () => {
+  document.querySelector(".finder .status").focus();
+  void loadStalls();
+});
+
 setupMenu();
 setupTickets();
 load();
 render();
+await loadStalls();
