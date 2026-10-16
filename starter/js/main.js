@@ -14,14 +14,19 @@ const tags = new Set(["all", "food", "music", "crafts", "drinks"]);
 let controller;
 let searchTimer;
 
-function updateUrl() {
+function updateUrl({ replace = false } = {}) {
   const url = new URL(window.location.href);
   const query = state.query.trim();
   if (query) url.searchParams.set("q", query);
   else url.searchParams.delete("q");
-  if (state.tag === "all") url.searchParams.delete("tag");
-  else url.searchParams.set("tag", state.tag);
-  history.pushState(null, "", url);
+  if (state.tag === "all") {
+    url.searchParams.delete("tag");
+  } else {
+    url.searchParams.set("tag", state.tag);
+  }
+  if (url.href === window.location.href) return;
+  if (replace) history.replaceState(null, "", url);
+  else history.pushState(null, "", url);
 }
 
 function readUrl(useUrlFilter = false) {
@@ -116,5 +121,6 @@ setupMenu();
 setupTickets();
 load();
 readUrl();
+updateUrl({ replace: true });
 render();
 await loadStalls();
